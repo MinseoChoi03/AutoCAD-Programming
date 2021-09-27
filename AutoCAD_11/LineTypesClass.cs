@@ -82,5 +82,42 @@ namespace AutoCAD_11
                 }
             }
         }
+
+        [CommandMethod("DeleteLineType")]
+        public void DeleteLineType()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    LinetypeTable ltTab = trans.GetObject(db.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+                    db.Celtype = ltTab["ByLayer"];
+                    foreach(ObjectId ltID in ltTab)
+                    {
+                        LinetypeTableRecord lttr = trans.GetObject(ltID, OpenMode.ForRead) as LinetypeTableRecord;
+                        if(lttr.Name == "DASHED2")
+                        {
+                            lttr.UpgradeOpen();
+
+                            //Delete the linetype
+                            lttr.Erase(true);
+
+                            //Commit the transaction
+                            trans.Commit();
+                            doc.Editor.WriteMessage("\nLineType deleted successfully");
+                            break;
+                        }
+                    }
+                }
+                catch(System.Exception ex)
+                {
+                    doc.Editor.WriteMessage("Error encountered : " + ex.Message);
+                    trans.Abort();
+                }
+            }
+        }
     }
 }
