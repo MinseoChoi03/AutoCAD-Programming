@@ -119,7 +119,7 @@ namespace AutoCAD_10
                         using (Circle c1 = new Circle())
                         {
                             c1.Center = new Point3d(0, 0, 0);
-                            c1.Radius = 2;
+                            c1.Radius = 5;
 
                             // Add the new object to the BlockTable record
                             btr.AppendEntity(c1);
@@ -199,7 +199,7 @@ namespace AutoCAD_10
                         mtx1.Location = insPt;
                         mtx1.Height = 5;
                         mtx1.Contents = "Move Me";
-                        mtx1.ColorIndex = 3;
+                        mtx1.ColorIndex = 3; //green
 
                         btr.AppendEntity(mtx1);
                         trans.AddNewlyCreatedDBObject(mtx1, true);
@@ -208,7 +208,7 @@ namespace AutoCAD_10
                         mtx2.Location = insPt;
                         mtx2.Height = 5;
                         mtx2.Contents = "Don't Move Me";
-                        mtx2.ColorIndex = 2;
+                        mtx2.ColorIndex = 2; //yellow
 
                         btr.AppendEntity(mtx2);
                         trans.AddNewlyCreatedDBObject(mtx2, true);
@@ -217,7 +217,7 @@ namespace AutoCAD_10
                         mtx3.Location = insPt;
                         mtx3.Height = 5;
                         mtx3.Contents = "Don't Move Me Either";
-                        mtx3.ColorIndex = 1;
+                        mtx3.ColorIndex = 1; //red
 
                         btr.AppendEntity(mtx3);
                         trans.AddNewlyCreatedDBObject(mtx3, true);
