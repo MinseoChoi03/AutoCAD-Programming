@@ -9,6 +9,46 @@ namespace AutoCAD_8
 {
     public class Class1
     {
+        [CommandMethod("DrawArc")]
+        public void DrawArc()
+        {
+            //Get the drawing document and the database object
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            //Create the transaction object inside the using block
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    //Get the BlockTable object
+                    BlockTable bt;
+                    bt = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+                    BlockTableRecord btr;
+                    btr = trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+                    //Create the Arc
+                    Point3d centerPt = new Point3d(10, 10, 0);
+                    double arcRad = 20.0;
+                    double startAngle = 1.0;
+                    double endAngle = 3.0;
+
+                    Arc arc = new Arc(centerPt, arcRad, startAngle, endAngle);
+                    arc.SetDatabaseDefaults();
+                    btr.AppendEntity(arc);
+                    trans.AddNewlyCreatedDBObject(arc, true);
+
+                    trans.Commit();
+                }
+                catch (System.Exception ex)
+                {
+                    doc.Editor.WriteMessage("Error encountered : " + ex.Message);
+                    trans.Abort();
+                }
+            }
+        }
+
         [CommandMethod("DrawCircle")]
         public void DrawCircle()
         {
