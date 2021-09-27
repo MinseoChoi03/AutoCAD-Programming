@@ -288,10 +288,10 @@ namespace AutoCAD_11
                 Point3d pt1 = new Point3d(0, 0, 0);
                 Point3d pt2 = new Point3d(100, 100, 0);
                 Line ln = new Line(pt1, pt2);
-                ln.Layer = "Cabinetry";
+                
 
                 // Assign a layer to the Line
-
+                ln.Layer = "Cabinetry";
 
                 btr.AppendEntity(ln);
                 trans.AddNewlyCreatedDBObject(ln, true);
