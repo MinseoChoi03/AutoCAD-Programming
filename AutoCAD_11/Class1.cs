@@ -149,5 +149,47 @@ namespace AutoCAD_11
                 }
             }
         }
+
+        [CommandMethod("SetLayerFrozenOrThaw")]
+        public static void SetLayerFrozenOrThaw()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    LayerTable lyTab = trans.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
+                    db.Clayer = lyTab["0"];
+                    foreach (ObjectId lyID in lyTab)
+                    {
+                        LayerTableRecord lytr = trans.GetObject(lyID, OpenMode.ForRead) as LayerTableRecord;
+                        if (lytr.Name == "Misc")
+                        {
+                            lytr.UpgradeOpen();
+
+                            // Freeze or Thaw the layer
+                            lytr.IsFrozen = true;
+                            //lytr.IsFrozen = false;
+
+                            // Commit the transaction
+                            trans.Commit();
+                            doc.Editor.WriteMessage("\nLayer " + lytr.Name + " has been frozen.");
+                            break;
+                        }
+                        else
+                        {
+                            doc.Editor.WriteMessage("\nLayer not found.");
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    doc.Editor.WriteMessage("Error encountered: " + ex.Message);
+                    trans.Abort();
+                }
+            }
+        }
     }
 }
