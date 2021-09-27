@@ -9,6 +9,45 @@ namespace AutoCAD_8
 {
     public class Class1
     {
+        [CommandMethod("DrawCircle")]
+        public void DrawCircle()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    doc.Editor.WriteMessage("Drawing a Circle!");
+                    BlockTable bt;
+                    bt = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+                    BlockTableRecord btr;
+                    btr = trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+                    //Specify the Circle's parameters (i.e centerpoint, radius, etc. etc)
+                    Point3d centerPt = new Point3d(100, 100, 0);
+                    double circleRad = 100.0;
+                    using (Circle circle = new Circle())
+                    {
+                        circle.Radius = circleRad;
+                        circle.Center = centerPt;
+
+                        btr.AppendEntity(circle);
+                        trans.AddNewlyCreatedDBObject(circle, true);
+                    }
+
+                    trans.Commit();
+                }
+                catch (System.Exception ex)
+                {
+                    doc.Editor.WriteMessage("Error encountered : " + ex.Message);
+                    trans.Abort();
+                }
+            }
+        }
+
         [CommandMethod("DrawMText")]
         public void DrawMText()
         {
