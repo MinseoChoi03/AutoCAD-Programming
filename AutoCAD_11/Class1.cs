@@ -270,5 +270,35 @@ namespace AutoCAD_11
                 }
             }
         }
+
+        [CommandMethod("SetLayer")]
+        public static void SetLayerToObject()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                BlockTable bt;
+                bt = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+                BlockTableRecord btr;
+                btr = trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+                Point3d pt1 = new Point3d(0, 0, 0);
+                Point3d pt2 = new Point3d(100, 100, 0);
+                Line ln = new Line(pt1, pt2);
+                ln.Layer = "Cabinetry";
+
+                // Assign a layer to the Line
+
+
+                btr.AppendEntity(ln);
+                trans.AddNewlyCreatedDBObject(ln, true);
+
+                trans.Commit();
+                doc.Editor.WriteMessage("\nNew Line object was added to Cabinetry layer.");
+            }
+        }
     }
 }
