@@ -59,5 +59,51 @@ namespace AutoCAD_11
                 }
             }
         }
+        [CommandMethod("UpdateLayer")]
+        public static void UpdateLayer()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    LayerTable lyTab = trans.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
+                    foreach (ObjectId lyID in lyTab)
+                    {
+                        LayerTableRecord lytr = trans.GetObject(lyID, OpenMode.ForRead) as LayerTableRecord;
+                        if (lytr.Name == "Misc")
+                        {
+                            lytr.UpgradeOpen();
+
+                            // Update the Color
+                            lytr.Color = Color.FromColorIndex(ColorMethod.ByLayer, 2);
+
+                            // Update the LineType
+                            LinetypeTable ltTab = trans.GetObject(db.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+                            if (ltTab.Has("Hidden") == true)
+                            {
+                                lytr.LinetypeObjectId = ltTab["Hidden"];
+                            }
+
+                            // Commit the transaction
+                            trans.Commit();
+                            doc.Editor.WriteMessage("\nCompleted updating Layer: " + lytr.Name);
+                            break;
+                        }
+                        else
+                        {
+                            doc.Editor.WriteMessage("\nSkipping Layer [" + lytr.Name + "].");
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    doc.Editor.WriteMessage("Error encountered: " + ex.Message);
+                    trans.Abort();
+                }
+            }
+        }
     }
 }
