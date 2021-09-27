@@ -62,5 +62,25 @@ namespace AutoCAD_11
                 trans.Commit();
             }
         }
+
+        [CommandMethod("SetCurrentLineType")]
+        public void SetCurrentLineType()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            string ltypeName = "DASHED2";
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                LinetypeTable ltTab = trans.GetObject(db.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+                if(ltTab.Has(ltypeName))
+                {
+                    db.Celtype = ltTab[ltypeName];
+                    doc.Editor.WriteMessage("LineType " + ltypeName + "is now the current LineType");
+
+                    trans.Commit();
+                }
+            }
+        }
     }
 }
