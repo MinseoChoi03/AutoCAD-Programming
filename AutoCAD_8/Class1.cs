@@ -39,9 +39,10 @@ namespace AutoCAD_8
                     trans.AddNewlyCreatedDBObject(In, true);
                     trans.Commit();
                 }
-                catch (System.Exception)
+                catch (System.Exception ex)
                 {
-                    throw;
+                    edt.WriteMessage("Error encountered : " + ex.Message); 
+                    trans.Abort();
                 }
             }
         }
