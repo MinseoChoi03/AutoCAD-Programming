@@ -228,5 +228,47 @@ namespace AutoCAD_11
                 }
             }
         }
+
+        [CommandMethod("LockUnlockLayer")]
+        public static void LockUnlockLayer()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    LayerTable lyTab = trans.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
+                    db.Clayer = lyTab["0"];
+                    foreach (ObjectId lyID in lyTab)
+                    {
+                        LayerTableRecord lytr = trans.GetObject(lyID, OpenMode.ForRead) as LayerTableRecord;
+                        if (lytr.Name == "Misc")
+                        {
+                            lytr.UpgradeOpen();
+
+                            // Lock / Unlock the layer
+                            lytr.IsLocked = true;
+                            //lytr.IsLocked = false;
+
+                            // Commit the transaction
+                            trans.Commit();
+                            doc.Editor.WriteMessage("\nLayer " + lytr.Name + " has been locked.");
+                            break;
+                        }
+                        else
+                        {
+                            doc.Editor.WriteMessage("\nSkipping Layer [" + lytr.Name + "]");
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    doc.Editor.WriteMessage("Error encountered: " + ex.Message);
+                    trans.Abort();
+                }
+            }
+        }
     }
 }
