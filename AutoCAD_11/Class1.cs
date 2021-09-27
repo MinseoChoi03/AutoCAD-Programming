@@ -28,6 +28,7 @@ namespace AutoCAD_11
                 trans.Commit();
             }
         }
+
         [CommandMethod("CreateLayer")]
         public static void CreateLayer()
         {
@@ -59,6 +60,7 @@ namespace AutoCAD_11
                 }
             }
         }
+
         [CommandMethod("UpdateLayer")]
         public static void UpdateLayer()
         {
@@ -95,6 +97,48 @@ namespace AutoCAD_11
                         else
                         {
                             doc.Editor.WriteMessage("\nSkipping Layer [" + lytr.Name + "].");
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    doc.Editor.WriteMessage("Error encountered: " + ex.Message);
+                    trans.Abort();
+                }
+            }
+        }
+
+        [CommandMethod("SetLayerOnOff")]
+        public static void SetLayerOnOff()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    LayerTable lyTab = trans.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
+                    db.Clayer = lyTab["0"];
+                    foreach (ObjectId lyID in lyTab)
+                    {
+                        LayerTableRecord lytr = trans.GetObject(lyID, OpenMode.ForRead) as LayerTableRecord;
+                        if (lytr.Name == "Misc")
+                        {
+                            lytr.UpgradeOpen();
+
+                            // Turn the layer ON or OFF
+                            lytr.IsOff = true;
+                            //lytr.IsOff = false;
+
+                            // Commit the transaction
+                            trans.Commit();
+                            doc.Editor.WriteMessage("\nLayer " + lytr.Name + " has been turned Off.");
+                            break;
+                        }
+                        else
+                        {
+                            doc.Editor.WriteMessage("\nLayer not found.");
                         }
                     }
                 }
