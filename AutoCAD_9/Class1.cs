@@ -8,6 +8,54 @@ namespace AutoCAD_9
 {
     public class Class1
     {
+        [CommandMethod("EraseObject")]
+        public void EraseObject()
+        {
+            //Get the drawing document and the database object
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            //Create the transaction object inside the using block
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    //Get the BlockTable object
+                    BlockTable bt;
+                    bt = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+                    BlockTableRecord btr;
+                    btr = trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+                    //Create a lightweight polyline
+                    using(Polyline p1 = new Polyline())
+                    {
+                        p1.AddVertexAt(0, new Point2d(2, 4), 0, 0, 0);
+                        p1.AddVertexAt(1, new Point2d(2, 4), 0, 0, 0);
+                        p1.AddVertexAt(2, new Point2d(2, 4), 0, 0, 0);
+
+                        //Add the new object to the block table record
+                        btr.AppendEntity(p1);
+                        trans.AddNewlyCreatedDBObject(p1, true);
+
+                        doc.SendStringToExecute("._zoom e",false, false, false);
+
+                        //Update the display and display an alert message
+                        doc.Editor.Regen();
+                        Application.ShowAlertDialog("Erase the newly added ployline.");
+
+                        //Erase the polyline from the drawing
+                        p1.Erase(true);
+                    }
+                    trans.Commit();
+                }
+                catch (System.Exception ex)
+                {
+                    doc.Editor.WriteMessage("Error encountered : " + ex.Message);
+                    trans.Abort();
+                }
+            }
+        }
         [CommandMethod("MultipleCopy")]
         public void MultipleCopy()
         {
@@ -27,7 +75,7 @@ namespace AutoCAD_9
                     BlockTableRecord btr;
                     btr = trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
 
-                    using(Circle c1 = new Circle())
+                    using (Circle c1 = new Circle())
                     {
                         c1.Center = new Point3d(0, 0, 0);
                         c1.Radius = 5;
@@ -36,7 +84,7 @@ namespace AutoCAD_9
                         btr.AppendEntity(c1);
                         trans.AddNewlyCreatedDBObject(c1, true);
 
-                        using(Circle c2 = new Circle())
+                        using (Circle c2 = new Circle())
                         {
                             c2.Center = new Point3d(0, 0, 0);
                             c2.Radius = 7;
@@ -49,7 +97,7 @@ namespace AutoCAD_9
                             col.Add(c1);
                             col.Add(c2);
 
-                            foreach(Entity acEnt in col)
+                            foreach (Entity acEnt in col)
                             {
                                 Entity ent;
                                 ent = acEnt.Clone() as Entity;
@@ -64,7 +112,6 @@ namespace AutoCAD_9
                             }
                         }
                     }
-
                     trans.Commit();
                 }
                 catch (System.Exception ex)
