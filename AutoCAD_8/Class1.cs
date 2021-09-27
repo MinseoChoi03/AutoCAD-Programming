@@ -9,6 +9,49 @@ namespace AutoCAD_8
 {
     public class Class1
     {
+        [CommandMethod("DrawPoly")]
+        public void DrawPoly()
+        {
+            //Get the drawing document and the database object
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            //Create the transaction object inside the using block
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    //Get the BlockTable object
+                    doc.Editor.WriteMessage("Drawing a 2D Polyline");
+                    BlockTable bt;
+                    bt = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+                    BlockTableRecord btr;
+                    btr = trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+                    //Specify the Polyline's coordinates
+                    Polyline pl = new Polyline();
+                    pl.AddVertexAt(0, new Point2d(0, 0), 0, 0, 0);
+                    pl.AddVertexAt(1, new Point2d(10, 10), 0, 0, 0);
+                    pl.AddVertexAt(1, new Point2d(20, 20), 0, 0, 0);
+                    pl.AddVertexAt(1, new Point2d(30, 30), 0, 0, 0);
+                    pl.AddVertexAt(1, new Point2d(40, 40), 0, 0, 0);
+                    pl.AddVertexAt(1, new Point2d(50, 50), 0, 0, 0);
+
+                    pl.SetDatabaseDefaults();
+                    btr.AppendEntity(pl);
+                    trans.AddNewlyCreatedDBObject(pl, true);
+
+                    trans.Commit();
+                }
+                catch (System.Exception ex)
+                {
+                    doc.Editor.WriteMessage("Error encountered : " + ex.Message);
+                    trans.Abort();
+                }
+            }
+        }
+
         [CommandMethod("DrawArc")]
         public void DrawArc()
         {
