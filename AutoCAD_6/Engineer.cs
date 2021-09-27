@@ -20,7 +20,7 @@ namespace AutoCAD_6
             Degree = degree;
         }
 
-        // Override the method
+        // Override the method_Polymorphism
         public void DoWork()
         {
             DoWorkPrivately();

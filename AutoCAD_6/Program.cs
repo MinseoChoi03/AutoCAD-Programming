@@ -30,6 +30,7 @@ namespace AutoCAD_6
             doctor1.DisplayPersonInfo();
             doctor1.DoWork();
 
+            //Polymorphism
             string work = doctor1.DoWork(5);
             Console.WriteLine("\n{0}", work);
 
@@ -43,7 +44,12 @@ namespace AutoCAD_6
 
             Console.WriteLine("\nI am an Engineer and my degree is: {0}", engineer1.Degree);
             engineer1.DisplayPersonInfo();
+            
+            //Polymorphism
             engineer1.DoWork();
+
+
+
         }
     }
 }

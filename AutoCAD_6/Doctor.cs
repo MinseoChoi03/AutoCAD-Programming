@@ -37,7 +37,7 @@ namespace AutoCAD_6
             Console.WriteLine("I perform surgery.");
         }
 
-        // Overload the method
+        // Overload the method_Polymorphism
         public string DoWork(int noOfTimes)
         {
             for (int i = 1; i <= noOfTimes; i++)
