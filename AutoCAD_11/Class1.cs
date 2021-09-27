@@ -191,5 +191,42 @@ namespace AutoCAD_11
                 }
             }
         }
+
+        [CommandMethod("DeleteLayer")]
+        public static void DeleteLayer()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    LayerTable lyTab = trans.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
+                    db.Clayer = lyTab["0"];
+                    foreach (ObjectId lyID in lyTab)
+                    {
+                        LayerTableRecord lytr = trans.GetObject(lyID, OpenMode.ForRead) as LayerTableRecord;
+                        if (lytr.Name == "Misc")
+                        {
+                            lytr.UpgradeOpen();
+
+                            // Delete the layer
+                            lytr.Erase(true);
+
+                            // Commit the transaction
+                            trans.Commit();
+                            doc.Editor.WriteMessage("\nSuccessfully deleted Layer [" + lytr.Name + "]");
+                            break;
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    doc.Editor.WriteMessage("Error encountered: " + ex.Message);
+                    trans.Abort();
+                }
+            }
+        }
     }
 }
