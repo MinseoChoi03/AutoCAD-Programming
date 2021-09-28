@@ -209,5 +209,49 @@ namespace AutoCAD_13
                 trans.Commit();
             }
         }
-    }
+
+
+        [CommandMethod("PickFirstSelection", CommandFlags.UsePickSet)]
+        public void PickFirstSelection()
+        {
+            // Get the Editor object
+            Editor edt = Application.DocumentManager.MdiActiveDocument.Editor;
+
+            // Get the PickFirst selection set
+            PromptSelectionResult psr;
+            psr = edt.SelectImplied();
+
+            // Create a SelectionSet
+            SelectionSet ss;
+
+            // Check if the prompt status is OK which means that objects were already selected.
+            if (psr.Status == PromptStatus.OK)
+            {
+                ss = psr.Value;
+                Application.ShowAlertDialog("\nNumber of objects in PickFirst selection: " + ss.Count.ToString());
+            }
+            else
+            {
+                Application.ShowAlertDialog("\nNo object selected.");
+            }
+
+
+            // Clear the PickFirst selection set
+            ObjectId[] ids = new ObjectId[0];
+            edt.SetImpliedSelection(ids);
+
+            // Request for objects to be selected in the drawing area
+            psr = edt.GetSelection();
+
+            // if the prompt status is OK, objects were selected
+            if (psr.Status == PromptStatus.OK)
+            {
+                ss = psr.Value;
+                Application.ShowAlertDialog("\nNumber of objects selected: " + ss.Count.ToString());
+            }
+            else
+            {
+                Application.ShowAlertDialog("\nNo object selected.");
+            }
+        }
 }
