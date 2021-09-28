@@ -46,6 +46,7 @@ namespace AutoCAD_13
             }
         }
 
+
         [CommandMethod("SelectObjectOnScreen")]
         public void SelectObjectOnScreen()
         {
@@ -74,6 +75,44 @@ namespace AutoCAD_13
                         }
                     }
                 }
+                // Commit the transaction
+                trans.Commit();
+            }
+        }
+
+
+        [CommandMethod("SelectWindowAndChangeColor")]
+        public void SelectWindowAndChangeColor()
+        {
+            // Get the Document, Database and Editor objects
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+            Editor edt = doc.Editor;
+
+            // Start the transaction
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                // Specify the coordinate of the window
+                PromptSelectionResult psr = edt.SelectWindow(new Point3d(0, 0, 0), new Point3d(500, 500, 0));
+                if (psr.Status == PromptStatus.OK)
+                {
+                    // Create a selectionset then assign the selected value in it
+                    SelectionSet ss = psr.Value;
+                    foreach (SelectedObject sObj in ss)
+                    {
+                        // Open the object for write and assign to an Entity and change the color to red
+                        Entity ent = trans.GetObject(sObj.ObjectId, OpenMode.ForWrite) as Entity;
+                        if (ent != null)
+                        {
+                            ent.ColorIndex = 1;
+                        }
+                    }
+                }
+                else
+                {
+                    edt.WriteMessage("No object selected.");
+                }
+
                 // Commit the transaction
                 trans.Commit();
             }
