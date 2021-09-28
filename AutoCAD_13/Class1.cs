@@ -464,5 +464,38 @@ namespace AutoCAD_13
                 edt.WriteMessage("There is no LWPolyline selected.");
             }
         }
+
+        [CommandMethod("SelectStairs")]
+        public void SelectStairs()
+        {
+            // Get the Editor
+            Editor edt = Application.DocumentManager.MdiActiveDocument.Editor;
+
+            // Create a TypedValue object
+            TypedValue[] tv = new TypedValue[2];
+            tv.SetValue(new TypedValue((int)DxfCode.Start, "LINE"), 0);
+            tv.SetValue(new TypedValue((int)DxfCode.LayerName, "Stairs"), 1);
+
+            // Create the filter
+            SelectionFilter filter = new SelectionFilter(tv);
+
+
+            // Create a PromptSelectionResult and pass the filter
+            PromptSelectionResult psr = edt.SelectAll(filter);
+
+            // Check if there is object selected
+            if (psr.Status == PromptStatus.OK)
+            {
+                // Create a selectionset based on the result
+                SelectionSet ss = psr.Value;
+
+                // Display the number of LWPolylines selected
+                edt.WriteMessage("There are a total of " + ss.Count.ToString() + " Stairs");
+            }
+            else
+            {
+                edt.WriteMessage("There is no LWPolyline selected.");
+            }
+        }
     }
 }
