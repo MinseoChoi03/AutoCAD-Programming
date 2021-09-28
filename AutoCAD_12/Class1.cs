@@ -125,5 +125,67 @@ namespace AutoCAD_12
                 trans.Commit();
             }
         }
+
+        [CommandMethod("DrawObjectUsingGetKeyWords")]
+        public void DrawObjectUsingGetKeyWords()
+        {
+            // Get the document object
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            // Create a PromptKeyWordOptions
+            PromptKeywordOptions pko = new PromptKeywordOptions("");
+            pko.Message = "\nWhat would you like to draw?: ";
+            pko.Keywords.Add("Line");
+            pko.Keywords.Add("Circle");
+            pko.Keywords.Add("Mtext");
+            pko.AllowNone = false;
+
+            PromptResult res = doc.Editor.GetKeywords(pko);
+            string answer = res.StringResult;
+            if (answer != null)
+            {
+                using (Transaction trans = db.TransactionManager.StartTransaction())
+                {
+                    BlockTable bt = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    BlockTableRecord btr = trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+                    switch (answer)
+                    {
+                        case "Line":
+                            Point3d pt1 = new Point3d(0, 0, 0);
+                            Point3d pt2 = new Point3d(100, 100, 0);
+                            Line ln = new Line(pt1, pt2);
+                            btr.AppendEntity(ln);
+                            trans.AddNewlyCreatedDBObject(ln, true);
+                            break;
+                        case "Circle":
+                            Point3d cenPt = new Point3d(0, 0, 0);
+                            Circle cir = new Circle();
+                            cir.Center = cenPt;
+                            cir.Radius = 10;
+                            cir.ColorIndex = 1;
+                            btr.AppendEntity(cir);
+                            trans.AddNewlyCreatedDBObject(cir, true);
+                            break;
+                        case "Mtext":
+                            Point3d insPt = new Point3d(0, 0, 0);
+                            MText mtx = new MText();
+                            mtx.Contents = "Hello World!";
+                            mtx.Location = insPt;
+                            mtx.TextHeight = 10;
+                            mtx.ColorIndex = 2;
+                            btr.AppendEntity(mtx);
+                            trans.AddNewlyCreatedDBObject(mtx, true);
+                            break;
+                        default:
+                            doc.Editor.WriteMessage("No option selected.");
+                            break;
+                    }
+                    // Commit the transaction
+                    trans.Commit();
+                }
+            }
+        }
     }
 }
