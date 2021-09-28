@@ -396,5 +396,39 @@ namespace AutoCAD_13
                 edt.WriteMessage("There is no object selected.");
             }
         }
+
+
+        [CommandMethod("BiFold")]
+        public void SelectBiFoldDoors()
+        {
+            // Get the Editor object
+            Editor edt = Application.DocumentManager.MdiActiveDocument.Editor;
+
+            edt.WriteMessage("\nSelecting all the Bifold doors in the drawing");
+
+            // Create a selectionset filter using a TypedValue
+            TypedValue[] tv = new TypedValue[2];
+            tv.SetValue(new TypedValue((int)DxfCode.Start, "INSERT"), 0);
+            tv.SetValue(new TypedValue((int)DxfCode.BlockName, "Door - Bifold"), 1);
+
+            // Now create a filter with these values
+            SelectionFilter filter = new SelectionFilter(tv);
+            // Create a PromptSelectionResult with the filter
+            PromptSelectionResult psr = edt.SelectAll(filter);
+
+            // Check if there is object selected
+            if (psr.Status == PromptStatus.OK)
+            {
+                // Create a selectionset and store the value from the Prompt
+                SelectionSet ss = psr.Value;
+
+                // Display the count of the French-Doors selected
+                edt.WriteMessage("\nThe number of BiFold-Doors selected is: " + ss.Count.ToString());
+            }
+            else
+            {
+                edt.WriteMessage("\nThere is no object selected.");
+            }
+        }
     }
 }
