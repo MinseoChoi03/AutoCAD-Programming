@@ -34,5 +34,47 @@ namespace AutoCAD_12
                 Application.ShowAlertDialog("No name entered.");
             }
         }
+
+        [CommandMethod("SetLayerUsingGetString")]
+        public void SetLayerUsingGetString()
+        {
+            // Get the document object
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+            Editor edt = doc.Editor;
+
+            using (Transaction trans = doc.TransactionManager.StartTransaction())
+            {
+                LayerTable lyTab = trans.GetObject(db.LayerTableId, OpenMode.ForRead) as LayerTable;
+
+                PromptStringOptions prompt = new PromptStringOptions("Enter layer to make current: ");
+                prompt.AllowSpaces = false;
+
+                // Get the results of the user input using a PromptResult
+                PromptResult result = edt.GetString(prompt);
+                if (result.Status == PromptStatus.OK)
+                {
+                    string layerName = result.StringResult;
+
+                    // Check if the entered layer name exist in the layer database
+                    if (lyTab.Has(layerName) == true)
+                    {
+                        // Set the layer current
+                        db.Clayer = lyTab[layerName];
+
+                        // Commit the transaction
+                        trans.Commit();
+                    }
+                    else
+                    {
+                        Application.ShowAlertDialog("The layer " + layerName + " you entered does not exist.");
+                    }
+                }
+                else
+                {
+                    Application.ShowAlertDialog("No layer entered.");
+                }
+            }
+        }
     }
 }
