@@ -299,5 +299,36 @@ namespace AutoCAD_13
                 trans.Commit();
             }
         }
+
+
+        [CommandMethod("SelectMTexts")]
+        public void SelectMTexts()
+        {
+            // Grab the Editor
+            Editor edt = Application.DocumentManager.MdiActiveDocument.Editor;
+
+            // Create TypedValue for the filter
+            TypedValue[] tv = new TypedValue[1];
+            tv.SetValue(new TypedValue((int)DxfCode.Start, "MTEXT"), 0);
+
+            // Create a filter and pass the TypedValue
+            SelectionFilter filter = new SelectionFilter(tv);
+
+            // Create a PromptSelectionResult based on this filter
+            PromptSelectionResult psr = edt.SelectAll(filter);
+
+            // Check if there is object selected
+            if (psr.Status == PromptStatus.OK)
+            {
+                // Create a selectionset and store the objects selected
+                SelectionSet ss = psr.Value;
+                // Display the number of objects selected in the drawing
+                edt.WriteMessage("There are a total MTexts selected: " + ss.Count.ToString());
+            }
+            else
+            {
+                edt.WriteMessage("No object selected.");
+            }
+        }
     }
 }
