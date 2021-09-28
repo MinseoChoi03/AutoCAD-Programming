@@ -430,5 +430,39 @@ namespace AutoCAD_13
                 edt.WriteMessage("\nThere is no object selected.");
             }
         }
+
+
+        [CommandMethod("SelectWalls")]
+        public void SelectWalls()
+        {
+            // Get the Editor
+            Editor edt = Application.DocumentManager.MdiActiveDocument.Editor;
+
+            // Create a TypedValue object
+            TypedValue[] tv = new TypedValue[2];
+            tv.SetValue(new TypedValue((int)DxfCode.Start, "LWPOLYLINE"), 0);
+            tv.SetValue(new TypedValue((int)DxfCode.LayerName, "Walls"), 1);
+
+            // Create the filter
+            SelectionFilter filter = new SelectionFilter(tv);
+
+
+            // Create a PromptSelectionResult and pass the filter
+            PromptSelectionResult psr = edt.SelectAll(filter);
+
+            // Check if there is object selected
+            if (psr.Status == PromptStatus.OK)
+            {
+                // Create a selectionset based on the result
+                SelectionSet ss = psr.Value;
+
+                // Display the number of LWPolylines selected
+                edt.WriteMessage("There are a total of " + ss.Count.ToString() + " LWPolylines");
+            }
+            else
+            {
+                edt.WriteMessage("There is no LWPolyline selected.");
+            }
+        }
     }
 }
