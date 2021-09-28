@@ -33,12 +33,15 @@
   <ItemGroup>
     <Reference Include="accoremgd">
       <HintPath>..\..\..\..\Desktop\새 폴더\accoremgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="acdbmgd">
       <HintPath>..\..\..\..\Desktop\새 폴더\acdbmgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="acmgd">
       <HintPath>..\..\..\..\Desktop\새 폴더\acmgd.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -50,7 +53,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="A4TitleBlock.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TBlock.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
