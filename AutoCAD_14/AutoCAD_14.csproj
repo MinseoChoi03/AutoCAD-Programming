@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="A0TitleBlock.cs" />
     <Compile Include="A1TitleBlock.cs" />
     <Compile Include="A2TitleBlock.cs" />
     <Compile Include="A3TitleBlock.cs" />
