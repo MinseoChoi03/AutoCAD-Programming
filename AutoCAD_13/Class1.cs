@@ -362,5 +362,39 @@ namespace AutoCAD_13
                 edt.WriteMessage("There is no LWPolyline selected.");
             }
         }
+
+
+        [CommandMethod("SelectFrenchDoors")]
+        public void SelectFrenchDoors()
+        {
+            // Get the Editor object
+            Editor edt = Application.DocumentManager.MdiActiveDocument.Editor;
+
+            edt.WriteMessage("Selecting all the blocks in the drawing");
+
+            // Create a selectionset filter using a TypedValue
+            TypedValue[] tv = new TypedValue[2];
+            tv.SetValue(new TypedValue((int)DxfCode.Start, "INSERT"), 0);
+            tv.SetValue(new TypedValue((int)DxfCode.BlockName, "Door - French"), 1);
+
+            // Now create a filter with these values
+            SelectionFilter filter = new SelectionFilter(tv);
+            // Create a PromptSelectionResult with the filter
+            PromptSelectionResult ssPrompt = edt.SelectAll(filter);
+
+            // Check if there is object selected
+            if (ssPrompt.Status == PromptStatus.OK)
+            {
+                // Create a selectionset and store the value from the Prompt
+                SelectionSet ss = ssPrompt.Value;
+
+                // Display the count of the French-Doors selected
+                edt.WriteMessage("The number of French-Doors selected is: " + ss.Count.ToString());
+            }
+            else
+            {
+                edt.WriteMessage("There is no object selected.");
+            }
+        }
     }
 }
