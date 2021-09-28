@@ -1,13 +1,14 @@
 ﻿using System;
 using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
+using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 
-namespace AutoCAD_14
+namespace TitleBlocks
 {
     public class TBlock
     {
-        //Properties for Lables
+        // Properties for Labels
         private string projectNameLabel;
         private string drawingTitleLabel;
         private string addressLabel;
@@ -18,10 +19,9 @@ namespace AutoCAD_14
         private string revisionNoLabel;
         private string drawingNoLabel;
 
-
-        //Properties for the actual drawing/project info
+        // Properties for the actual drawing/project info
         public string ProjectName { get; set; }
-        public string DrawingTitle { get; set ; }
+        public string DrawingTitle { get; set; }
         public string Address { get; set; }
         public string ProjectNo { get; set; }
         public string ClientRef { get; set; }
@@ -32,18 +32,18 @@ namespace AutoCAD_14
 
         public TBlock()
         {
-            //Labels
+            // Labels
             projectNameLabel = "Project Name";
             drawingTitleLabel = "Dwg Title";
             addressLabel = "Address";
             projectNoLabel = "Proj. No";
             clientRefLabel = "Client Ref";
-            drawingDateLabel = "Date : ";
+            drawingDateLabel = "Date";
             drawingScaleLabel = "Scale";
-            revisionNoLabel = "Rev. No";
+            revisionNoLabel = "Rev No.";
             drawingNoLabel = "Dwg. No";
 
-            //Default Values
+            // Default Values
             ProjectName = "Default Project Name";
             DrawingTitle = "Default Drawing Title";
             Address = "Default Location";
@@ -57,46 +57,41 @@ namespace AutoCAD_14
 
         public void DrawTitleBlock(int height, int width)
         {
-            //Get the Document and Database object
+            // Get the Document and Database object
             Document doc = Application.DocumentManager.MdiActiveDocument;
             Database db = doc.Database;
 
-            using(Transaction trans = doc.TransactionManager.StartTransaction())
+            using (Transaction trans = doc.TransactionManager.StartTransaction())
             {
-
                 BlockTable bt = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
                 BlockTableRecord btr = trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
 
-                //Draw the outer border based on the height and width
+                // Draw the outer border based on the height and width
                 Polyline pl = new Polyline();
                 pl.AddVertexAt(0, new Point2d(0, 0), 0, 0, 0);
-                pl.AddVertexAt(0, new Point2d(0, height), 0, 0, 0);
-                pl.AddVertexAt(0, new Point2d(width, height), 0, 0, 0);
-                pl.AddVertexAt(0, new Point2d(width, 0), 0, 0, 0);
-                pl.Closed = true;
+                pl.AddVertexAt(1, new Point2d(0, height), 0, 0, 0);
+                pl.AddVertexAt(2, new Point2d(width, height), 0, 0, 0);
+                pl.AddVertexAt(3, new Point2d(width, 0), 0, 0, 0);
+                pl.Closed = true;                
 
                 btr.AppendEntity(pl);
                 trans.AddNewlyCreatedDBObject(pl, true);
 
-                //Draw a line from the right border at 10% to the left
+                // Draw a line from the right border at 10% to the left
                 Line ln = new Line();
-                int titleWidth = Convert.ToInt32(width * 0.1); //Titleblock space is 10% of the paper width
+                int titleWidth = Convert.ToInt32(width * 0.1);            // Titleblock space is 10% of the paper width
                 ln.ColorIndex = 1;
                 ln.StartPoint = new Point3d((width - titleWidth), 0, 0);
                 ln.EndPoint = new Point3d((width - titleWidth), height, 0);
-
                 btr.AppendEntity(ln);
                 trans.AddNewlyCreatedDBObject(ln, true);
 
-
-                //Draw the Horizontal Partition Lines. Start from the bottom
+                // Draw the Horizontal Partition Lines. Start from the bottom
                 Line hLn1 = new Line();
                 hLn1.ColorIndex = 2;
                 int titleHeight = Convert.ToInt32(height * 0.02);
-
                 hLn1.StartPoint = new Point3d((width - titleWidth), titleHeight, 0);
-                hLn1.EndPoint = new Point3d(width, titleWidth, 0);
-
+                hLn1.EndPoint = new Point3d(width, titleHeight, 0);
                 btr.AppendEntity(hLn1);
                 trans.AddNewlyCreatedDBObject(hLn1, true);
 
@@ -149,7 +144,7 @@ namespace AutoCAD_14
                 btr.AppendEntity(vLn2);
                 trans.AddNewlyCreatedDBObject(vLn2, true);
 
-                Line vLn3 = new Line();
+                Line vLn3 = new Line();                
                 vLn3.ColorIndex = 10;
                 int titleWidth3 = Convert.ToInt32(width * 0.07);
                 vLn3.StartPoint = new Point3d((width - titleWidth3), 0, 0);
@@ -188,7 +183,7 @@ namespace AutoCAD_14
                 trans.AddNewlyCreatedDBObject(txAddr, true);
 
                 MText txProjNo = new MText();
-                txProjNo.Contents = this.projectNoLabel;
+                txProjNo.Contents =  this.projectNoLabel;
                 txProjNo.TextHeight = height * 0.0025;
                 xCoord = (width - titleWidth3 + (titleWidth3 * 0.02));
                 yCoord = (titleHeight2 - (titleHeight2 * 0.02));
@@ -266,7 +261,7 @@ namespace AutoCAD_14
                 trans.AddNewlyCreatedDBObject(txDwgTitle, true);
 
                 MText txAddress = new MText();
-                txAddress.Contents = this.Address;
+                txAddress.Contents = this.Address;                
                 txAddress.TextHeight = height * 0.004;
                 xCoord = (width - titleWidth + (titleWidth * 0.01));
                 yCoord = titleHeight2 - (titleHeight2 * 0.2);

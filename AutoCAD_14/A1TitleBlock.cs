@@ -1,13 +1,13 @@
-﻿namespace AutoCAD_14
+﻿namespace TitleBlocks
 {
-    class A1TitleBlock : TBlock
+    public class A1TitleBlock : TBlock
     {
         public int Height { get; set; }
         public int Width { get; set; }
 
         public A1TitleBlock()
         {
-            Height = 593;
+            Height = 594;
             Width = 841;
         }
     }
