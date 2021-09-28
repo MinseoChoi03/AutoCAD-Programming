@@ -18,7 +18,7 @@ namespace AutoCAD_11
             using (Transaction trans = db.TransactionManager.StartTransaction())
             {
                 TextStyleTable stTab = trans.GetObject(db.TextStyleTableId, OpenMode.ForRead) as TextStyleTable;
-                foreach(ObjectId stID in stTab)
+                foreach (ObjectId stID in stTab)
                 {
                     TextStyleTableRecord tstr = trans.GetObject(stID, OpenMode.ForRead) as TextStyleTableRecord;
                     doc.Editor.WriteMessage("\nStyle name : " + tstr.Name);
@@ -54,6 +54,31 @@ namespace AutoCAD_11
 
                 //Commit the transactoin
                 trans.Commit();
+            }
+        }
+
+        [CommandMethod("SetCurrentTextStyle")]
+        public void SetCurrentTextStyle()
+        {
+            //Get the current docucment and databases
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                TextStyleTable stTab = trans.GetObject(db.TextStyleTableId, OpenMode.ForRead) as TextStyleTable;
+                foreach (ObjectId stID in stTab)
+                {
+                    TextStyleTableRecord tstr = trans.GetObject(stID, OpenMode.ForRead) as TextStyleTableRecord;
+                    if (tstr.Name == "ARCHITECT")
+                    {
+                        Application.SetSystemVariable("TEXTSTYLE", "ARCHITECT");
+                        doc.Editor.WriteMessage("\nStyle name : " + tstr.Name + "is now the default TextStyle.");
+                        //Commit the transactoin
+                        trans.Commit();
+                        break;
+                    }
+                }
             }
         }
     }
