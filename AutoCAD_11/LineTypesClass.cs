@@ -6,7 +6,7 @@ using Autodesk.AutoCAD.Geometry;
 
 namespace AutoCAD_11
 {
-    class LineTypesClass
+    public class LineTypesClass
     {
         [CommandMethod("ListLineTypes")]
         public void ListLineTypes()
