@@ -200,6 +200,60 @@ namespace AutoCAD_12
             Application.ShowAlertDialog("\nDistance between points: " + pdr.Value.ToString());
         }
 
+        [CommandMethod("CountObjects")]
+        public void CountObjectsInModelOrPaperSpace()
+        {
+            // Get the document and database objects
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+            Editor edt = doc.Editor;
 
+            // Start a Transaction
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                // Open BlockTable for reading
+                BlockTable bt;
+                bt = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+                // Prompt the user to choose between Model or Paper Space
+                PromptKeywordOptions pko = new PromptKeywordOptions("");
+                pko.Message = "Enter which Space to count the objects: ";
+                pko.Keywords.Add("Model");
+                pko.Keywords.Add("Paper");
+                pko.AllowNone = false;
+                pko.AppendKeywordsToMessage = true;
+
+                // Get the result
+                PromptResult pr = doc.Editor.GetKeywords(pko);
+
+                SelectionSet ss;
+                TypedValue[] tv = new TypedValue[1];
+                SelectionFilter filter;
+                PromptSelectionResult psr;
+                switch (pr.StringResult)
+                {
+                    case "Model":
+                        // count the objects in Modelspace                        
+                        tv.SetValue(new TypedValue(67, 0), 0);
+                        filter = new SelectionFilter(tv);
+                        psr = edt.SelectAll(filter);
+                        ss = psr.Value;
+
+                        // Display the number of objects found
+                        Application.ShowAlertDialog("Object found in Modelspace: " + ss.Count.ToString());
+                        break;
+                    case "Paper":
+                        // count the objects in Paperspace                        
+                        tv.SetValue(new TypedValue(67, 1), 0);
+                        filter = new SelectionFilter(tv);
+                        psr = edt.SelectAll(filter);
+                        ss = psr.Value;
+
+                        // Display the number of objects found
+                        Application.ShowAlertDialog("Object found in Paperspace: " + ss.Count.ToString());
+                        break;
+                }
+            }
+        }
     }
 }
