@@ -163,5 +163,51 @@ namespace AutoCAD_13
                 }
             }
         }
+
+
+        [CommandMethod("SelectFenceAndChangeLayer")]
+        public void SelectFenceAndChangeLayer()
+        {
+            // Get the Document, Database and Editor object
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+            Editor edt = doc.Editor;
+
+            // Set the transaction
+            using (Transaction trans = doc.TransactionManager.StartTransaction())
+            {
+                // Select objects by fence
+                Point3dCollection p3dCol = new Point3dCollection();
+                p3dCol.Add(new Point3d(0, 0, 0));
+                p3dCol.Add(new Point3d(500, 300, 0));
+                PromptSelectionResult psr = edt.SelectFence(p3dCol);
+
+                // Check if there are objects selected
+                if (psr.Status == PromptStatus.OK)
+                {
+                    SelectionSet ss = psr.Value;
+
+                    foreach (SelectedObject sObj in ss)
+                    {
+                        if (sObj != null)
+                        {
+                            Entity ent = trans.GetObject(sObj.ObjectId, OpenMode.ForWrite) as Entity;
+                            if (ent != null)
+                            {
+                                // Change the layer
+                                ent.Layer = "Misc";
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    edt.WriteMessage("\nNo object selected.");
+                }
+
+                // Commit the Transaction
+                trans.Commit();
+            }
+        }
     }
 }
