@@ -81,5 +81,38 @@ namespace AutoCAD_11
                 }
             }
         }
+
+        [CommandMethod("SetTextStyleToObject")]
+        public void SetTextStyleToObject()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                BlockTable bt;
+                bt = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+                BlockTableRecord btr;
+                btr = trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+                using (MText mtx = new MText())
+                {
+                    Point3d insPt = new Point3d(0, 0, 0);
+                    mtx.Contents = "Helllo AutoCAD!";
+                    mtx.TextHeight = 9;
+                    mtx.Location = insPt;
+
+                    //Set the TextStyle
+                    mtx.TextStyleId = db.Textstyle;
+
+                    btr.AppendEntity(mtx);
+                    trans.AddNewlyCreatedDBObject(mtx, true);
+
+                    //Commit the transaction
+                    trans.Commit();
+                }
+            }
+        }
     }
 }
