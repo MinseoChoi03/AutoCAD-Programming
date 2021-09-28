@@ -187,5 +187,19 @@ namespace AutoCAD_12
                 }
             }
         }
+
+        [CommandMethod("GetDistanceBetweenTwoPoints")]
+        public void GetDistanceBetweenTwoPoints()
+        {
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Editor edt = doc.Editor;
+
+            PromptDoubleResult pdr;
+            pdr = edt.GetDistance("Pick two points to get the distance: ");
+
+            Application.ShowAlertDialog("\nDistance between points: " + pdr.Value.ToString());
+        }
+
+
     }
 }
