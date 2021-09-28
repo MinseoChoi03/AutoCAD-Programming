@@ -126,7 +126,8 @@ namespace AuditDrawing
                     {
                         file.WriteLine("List of Objects found in the drawing: ");
                         file.WriteLine("Lines, MTexts, Polylines, Arcs, Blocks, Total");
-                        file.WriteLine(lineCount.ToString() + "," + mtxCount.ToString() + "," + plCount.ToString() + "," + arcCount.ToString() + "," + blkCount.ToString() + "," + totalCount.ToString());
+                        file.WriteLine(lineCount.ToString() + "," + mtxCount.ToString() + "," + plCount.ToString() 
+                            + "," + arcCount.ToString() + "," + blkCount.ToString() + "," + totalCount.ToString());
                     }
                 }
             }
