@@ -76,5 +76,54 @@ namespace AutoCAD_12
                 }
             }
         }
+
+        // This method will draw a Line based on the user input
+        [CommandMethod("CreateLineUsingGetPoint")]
+        public void CreateLineUsingGetPoint()
+        {
+            // Get the document object
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+            Editor edt = doc.Editor;
+
+            // Prompt for the starting point
+            PromptPointOptions ppo = new PromptPointOptions("Enter start point: ");
+            PromptPointResult ppr = edt.GetPoint(ppo);
+            Point3d startPt = ppr.Value;
+
+            // Prompt for the end point and specify the startpoint as the basepoint
+            ppo = new PromptPointOptions("Enter end point: ");
+            ppo.UseBasePoint = true;
+            ppo.BasePoint = startPt;
+            ppr = edt.GetPoint(ppo);
+            Point3d endPt = ppr.Value;
+
+            if (startPt == null || endPt == null)
+            {
+                edt.WriteMessage("Invalid point.");
+                return;
+            }
+            // Start the Transaction
+            using (Transaction trans = db.TransactionManager.StartTransaction())
+            {
+                // Get the BlockTable
+                BlockTable bt;
+                bt = trans.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+
+                BlockTableRecord btr;
+                btr = trans.GetObject(bt[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+                // Construct the Line based on the 2 points above
+                Line ln = new Line(startPt, endPt);
+                ln.SetDatabaseDefaults();
+
+                // Add the Line to the drawing
+                btr.AppendEntity(ln);
+                trans.AddNewlyCreatedDBObject(ln, true);
+
+                // Commit the Transaction
+                trans.Commit();
+            }
+        }
     }
 }
