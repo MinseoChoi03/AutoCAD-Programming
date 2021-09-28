@@ -20,7 +20,7 @@ namespace AutoCAD_11
                 foreach (ObjectId ltID in ltTab)
                 {
                     LinetypeTableRecord lttr = trans.GetObject(ltID, OpenMode.ForRead) as LinetypeTableRecord;
-                    doc.Editor.WriteMessage("\n Line Type name : " + lttr.name);
+                    doc.Editor.WriteMessage("\n Line Type name : " + lttr.Name);
                 }
                 trans.Commit();
             }
