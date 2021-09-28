@@ -254,5 +254,50 @@ namespace AutoCAD_13
                 Application.ShowAlertDialog("\nNo object selected.");
             }
         }
+
+
+        //=============================================================
+
+
+        [CommandMethod("SelectLines")]
+        public void SelectLines()
+        {
+            // Get the Document, Database and Editor object
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+            Editor edt = doc.Editor;
+
+            using (Transaction trans = doc.TransactionManager.StartTransaction())
+            {
+                edt.WriteMessage("Selecting all the Line objects.");
+
+                // Set the Filter for the Line using a TypedValue type
+                TypedValue[] tv = new TypedValue[1];
+                tv.SetValue(new TypedValue((int)DxfCode.Start, "LINE"), 0);
+                SelectionFilter filter = new SelectionFilter(tv);
+
+                // Create a PromptSelectionResult
+                PromptSelectionResult psr = edt.SelectAll(filter);      // This will select automatically
+                //PromptSelectionResult psr = edt.GetSelection(filter); // This will allow the user to select on screen                
+
+                // Check if there is object selected
+                if (psr.Status == PromptStatus.OK)
+                {
+                    SelectionSet ss = psr.Value;
+
+                    foreach (SelectedObject sObj in ss)
+                    {
+                        // Create an Entity to store the object from the selectionset
+                        Entity ent = trans.GetObject(sObj.ObjectId, OpenMode.ForWrite) as Entity;
+                        ent.ColorIndex = 1;
+                    }
+
+                    edt.WriteMessage("There are a total of " + ss.Count.ToString() + " selected.");
+
+                }
+                // Commit the Transaction
+                trans.Commit();
+            }
+        }
     }
 }
