@@ -117,5 +117,51 @@ namespace AutoCAD_13
                 trans.Commit();
             }
         }
+
+
+        [CommandMethod("SelectCrossingWindowAndDelete")]
+        public void SelectCrossingWindowAndDelete()
+        {
+            // Get the Drawing document, Database and Editor objects
+            Document doc = Application.DocumentManager.MdiActiveDocument;
+            Database db = doc.Database;
+            Editor edt = doc.Editor;
+
+            using (Transaction trans = doc.TransactionManager.StartTransaction())
+            {
+                // Specify the coordinate for the crossing
+                PromptSelectionResult psr = edt.SelectCrossingWindow(new Point3d(0, 0, 0), new Point3d(500, 500, 0));
+                // If the PromptStatus is OK then object is selected
+                if (psr.Status == PromptStatus.OK)
+                {
+                    // Store in a selectionset then display the count of the object selected
+                    SelectionSet ss = psr.Value;
+
+                    edt.WriteMessage("\nTotal objects selected: " + ss.Count.ToString());
+
+                    // Then loop through the selection set and delete the object
+                    foreach (SelectedObject sObj in ss)
+                    {
+                        // Check if a valid object is returned
+                        if (sObj != null)
+                        {
+                            // Open the object for writing
+                            Entity ent = trans.GetObject(sObj.ObjectId, OpenMode.ForWrite) as Entity;
+                            if (ent != null)
+                            {
+                                // Erase the entity
+                                ent.Erase(true);
+                            }
+                        }
+                    }
+                    // Commit the transaction
+                    trans.Commit();
+                }
+                else
+                {
+                    edt.WriteMessage("\nNo object selected.");
+                }
+            }
+        }
     }
 }
